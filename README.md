@@ -92,7 +92,14 @@ Experimentation and parameter tuning are crucial for achieving accurate motion d
 We encourage the use of Python and OpenCV for this task, but you are free to explore other tools and libraries if necessary.
 Consider to create a modular and reusable codebase that can be extended for future enhancements and applications.
 
+## Requirements
+- Python (3.11 suggested since dependencies are not updated for 3.12)
+
 ## How to run
+Create the virtual enviroment:
+```
+python -m venv venv
+```
 Activate the virtual enviroment:
 ```
 source venv/bin/activate

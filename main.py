@@ -9,8 +9,8 @@ NOISE_SIGMA = 1
 
 def main():
     cap = get_random_video()
-    # mog1(cap, MAX_FRAMES, LEARNING_RATE, HISTORY, N_MIXTURES, BACKGROUND_RATIO, NOISE_SIGMA)
-    mog2(cap, MAX_FRAMES, LEARNING_RATE)
+    mog1_data = mog1(cap, MAX_FRAMES, LEARNING_RATE, HISTORY, N_MIXTURES, BACKGROUND_RATIO, NOISE_SIGMA)
+    mog2_data = mog2(cap, MAX_FRAMES, LEARNING_RATE)
 
 if __name__ == "__main__":
     main()
