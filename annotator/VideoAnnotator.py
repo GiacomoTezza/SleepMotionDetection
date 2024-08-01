@@ -61,27 +61,3 @@ class VideoAnnotator:
         # Save the dictionary as a JSON file
         with open(target_filename, 'w') as f:
             json.dump(video_info, f, indent=4)
-
-# Example usage
-if __name__ == "__main__":
-    annotator = VideoAnnotator('path_to_video.mp4')
-    
-    # Example motion data from MOG2 algorithm
-    example_motion_data = [
-        {"motion_present": True, "motion_energy": 0.1},
-        {"motion_present": False, "motion_energy": 0.0},
-        # Add more frames as needed
-    ]
-    
-    annotator.add_motion_data(
-        algorithm_id=1,
-        algorithm_name="MOG2-parameters-1",
-        parameters={
-            "LearningRate": 0.1,
-            "History": 10,
-            "VarThreshold": 10
-        },
-        motion_data=example_motion_data
-    )
-    
-    annotator.save_to_json('output.json')
