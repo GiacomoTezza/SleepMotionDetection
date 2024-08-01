@@ -46,8 +46,8 @@ def mog1(cap, max_frames, learning_rate, history, n_mixtures, background_ratio, 
             if cv2.waitKey(10) == ord('q') or not ret:
                 break
 
-    # When everything done, release the capture
-    cap.release()
+    # When everything done, restart the capture
+    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
     if not headless:
         cv2.destroyAllWindows()
     
@@ -94,8 +94,8 @@ def mog2(cap, max_frames, learning_rate, motion_energy_threshold=0.01, headless=
             if cv2.waitKey(10) == ord('q') or not ret:
                 break
 
-    # When everything done, release the capture
-    cap.release()
+    # When everything done, restart the capture
+    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
     if not headless:
         cv2.destroyAllWindows()
     

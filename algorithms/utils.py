@@ -15,8 +15,9 @@ def get_screen_resolution():
 
 def get_random_video():
     random_dir = str(random.randint(1, 28)).zfill(2)
-    cap = cv2.VideoCapture(f"../dataset/{random_dir}/rgb.avi")
-    return cap
+    filename = f"../dataset/{random_dir}/rgb.avi"
+    cap = cv2.VideoCapture(filename)
+    return (cap, filename)
 
 def calculate_window_positions(num_windows):
     # Get screen dimensions
