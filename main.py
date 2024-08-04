@@ -1,6 +1,11 @@
 from algorithms import get_random_video, mog1, mog2, knn
 from annotator import VideoAnnotator
 
+INPUT_FOLDER = "./input/dataset1"
+OUTPUT_FOLDER = "./output/"
+OUTPUT_JSON = "output.json"
+HEADLESS = False
+
 LEARNING_RATE = -1      # alpha
 HISTORY = 200           # t
 N_MIXTURES = 5          # K (number of gaussians)
@@ -24,7 +29,7 @@ Github:  https://github.com/GiacomoTezza
 
 def annotateMog1(name, annotator, cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma, motion_energy_threshold):
     print(f"[MOG1][{name}] Running...")
-    mog1_data = mog1(cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma, motion_energy_threshold, headless=True)
+    mog1_data = mog1(cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma, motion_energy_threshold, headless=HEADLESS)
     annotator.add_motion_data(
         algorithm_name=f"MOG1-{name}",
         parameters={
@@ -42,7 +47,7 @@ def annotateMog1(name, annotator, cap, learning_rate, history, n_mixtures, backg
 
 def annotateMog2(name, annotator, cap, learning_rate, motion_energy_threshold):
     print(f"[MOG2][{name}] Running...")
-    mog2_data = mog2(cap, learning_rate, motion_energy_threshold, headless=True)
+    mog2_data = mog2(cap, learning_rate, motion_energy_threshold, headless=HEADLESS)
     annotator.add_motion_data(
         algorithm_name=f"MOG2-{name}",
         parameters={
@@ -56,7 +61,7 @@ def annotateMog2(name, annotator, cap, learning_rate, motion_energy_threshold):
 
 def annotateKnn(name, annotator, cap, learning_rate, dist2_threshold, detect_shadows, motion_energy_threshold):
     print(f"[KNN][{name}] Running...")
-    knn_data = knn(cap, learning_rate, dist2_threshold, detect_shadows, motion_energy_threshold, headless=True)
+    knn_data = knn(cap, learning_rate, dist2_threshold, detect_shadows, motion_energy_threshold, headless=HEADLESS)
     annotator.add_motion_data(
         algorithm_name=f"KNN-{name}",
         parameters={
@@ -72,13 +77,13 @@ def annotateKnn(name, annotator, cap, learning_rate, dist2_threshold, detect_sha
 
 def main():
     banner()
-    cap, filename = get_random_video()
+    cap, filename = get_random_video(INPUT_FOLDER)
     annotator = VideoAnnotator(filename)
     annotateMog1("param1", annotator, cap, LEARNING_RATE, HISTORY, N_MIXTURES, BACKGROUND_RATIO, NOISE_SIGMA, MOTION_ENERGY_THRESHOLD)
     annotateMog2("param1", annotator, cap, LEARNING_RATE, MOTION_ENERGY_THRESHOLD)
     annotateKnn("param1", annotator, cap, LEARNING_RATE, 400, False, MOTION_ENERGY_THRESHOLD)
     cap.release()
-    annotator.save_to_json("./output.json")
+    annotator.save_to_json(OUTPUT_FOLDER+OUTPUT_JSON)
 
 if __name__ == "__main__":
     main()

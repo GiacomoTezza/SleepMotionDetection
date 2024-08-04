@@ -1,5 +1,6 @@
 import cv2
 import random
+from os import listdir, path
 from screeninfo import get_monitors
 
 def get_screen_resolution():
@@ -13,9 +14,10 @@ def get_screen_resolution():
     else:
         return None
 
-def get_random_video():
-    random_dir = str(random.randint(1, 28)).zfill(2)
-    filename = f"../dataset/{random_dir}/rgb.avi"
+def get_random_video(directory):
+    file = random.choice(listdir(directory))
+    filename = f"{directory}/{path.normpath(file)}"
+    print(f"[INPUT] {filename}\n")
     cap = cv2.VideoCapture(filename)
     return (cap, filename)
 

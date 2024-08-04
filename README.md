@@ -95,6 +95,15 @@ Consider to create a modular and reusable codebase that can be extended for futu
 ## Requirements
 - Python (3.11 suggested since dependencies are not updated for 3.12)
 
+## Usage
+Adjust the global variables inside your `main.py` file to specify paths and other preferences. If you wanna use the default ones make sure to have your video placed in the input folder inside the repository.
+```
+cd SleepMotionDetection
+mkdir input
+mv path_to_your_videos ./input
+```
+Output will be produced in the output folder inside the repository (if a different path is not specified).
+
 ## How to run
 Create the virtual enviroment:
 ```
