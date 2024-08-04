@@ -7,21 +7,21 @@ This task offers an opportunity to gain hands-on experience in computer vision a
 
 ## Tasks:
 ### Algorithm research and implementation:
-- [ ] Research and select a suitable motion detection algorithm (hint: MOG2).
+- [X] Research and select a suitable motion detection algorithm (MOG1, MOG2, KNN).
 - [ ] Checkout papers "Action Recognition with Dynamic Image Networks" https://arxiv.org/abs/1612.00738. if interested in exploring more advanced techniques for motion detection.
-- [ ] Implement the chosen algorithm using Python and OpenCV. Can be more than one algorithm.
-- [ ] Understand the functioning of the chosen algorithm and its parameters.
+- [X] Implement the chosen algorithm using Python and OpenCV. Can be more than one algorithm.
+- [X] Understand the functioning of the chosen algorithm and its parameters.
 ### Parameters Tuning and Motion Energy Measurement:
 - [ ] Identify the parameters affecting the sensitivity to motion.
 - [ ] Experiment with different parameter values to optimize motion detection.
-- [ ] Develop a method to measure the "motion energy" for each frame.
+- [X] Develop a method to measure the "motion energy" for each frame.
 ### Handling False Positives :
 - [ ] Investigate and address cases of false positives, such as motion caused by video artifacts.
 - [ ] Implement strategies to minimize false detections and ensure accurate results.
 ### Testing and deliverables :
-- [ ] Python script implementing the motion detection algorithm.
+- [X] Python script implementing the motion detection algorithm.
 - [ ] Analyze the motion detection results for each video and create tech report detailing the parameter tuning process and findings.
-- [ ] Dataset containing motion energy and motion presence data for each frame. The idea is to generate a structured data file (preferably in CSV or JSON format) for each video, containing information about motion energy and the presence of motion for every frame based on the chosen parameters.
+- [X] Dataset containing motion energy and motion presence data for each frame. The idea is to generate a structured data file (preferably in CSV or JSON format) for each video, containing information about motion energy and the presence of motion for every frame based on the chosen parameters.
 - [ ] Optional: create a visualization tool to display the motion detection results and motion energy over time (simply web-based or using a Python library like Matplotlib).
 
 #### Target data file example:

@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 from .utils import calculate_window_positions
+from tqdm import trange
 
-def mog1(cap, max_frames, learning_rate, history, n_mixtures, background_ratio, noise_sigma, motion_energy_threshold=0.01, headless=True):
+def mog1(cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma, motion_energy_threshold=0.01, headless=True):
     fgbg = cv2.bgsegm.createBackgroundSubtractorMOG(history, n_mixtures, background_ratio, noise_sigma)
     motion_data = []
 
@@ -13,7 +14,7 @@ def mog1(cap, max_frames, learning_rate, history, n_mixtures, background_ratio, 
             cv2.resizeWindow(window_name, width, height)
             cv2.moveWindow(window_name, x, y)
 
-    for i in range(max_frames):
+    for i in trange(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))):
         # Capture frame-by-frame
         ret, frame = cap.read()
 
@@ -53,7 +54,7 @@ def mog1(cap, max_frames, learning_rate, history, n_mixtures, background_ratio, 
     
     return motion_data
 
-def mog2(cap, max_frames, learning_rate, motion_energy_threshold=0.01, headless=True):
+def mog2(cap, learning_rate, motion_energy_threshold=0.01, headless=True):
     fgbg = cv2.createBackgroundSubtractorMOG2()
     motion_data = []
 
@@ -63,7 +64,7 @@ def mog2(cap, max_frames, learning_rate, motion_energy_threshold=0.01, headless=
             cv2.namedWindow(window_name)
             cv2.moveWindow(window_name, x, y)
 
-    for i in range(max_frames):
+    for i in trange(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))):
         # Capture frame-by-frame
         ret, frame = cap.read()
 
