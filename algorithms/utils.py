@@ -1,5 +1,9 @@
 import cv2
 import random
+import numpy as np
+# import matplotlib
+# matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
 from os import listdir, path
 from screeninfo import get_monitors
 
@@ -58,3 +62,26 @@ def calculate_window_positions(num_windows):
     else:
         # Unsupported number of windows
         raise ValueError("Unsupported number of windows")
+
+
+def initialize_plot(max_frames, motion_energy_threshold):
+    plt.ion()
+    fig, ax = plt.subplots()
+    ax.set_xlim(0, max_frames)
+    ax.set_ylim(0, 1)
+    motion_energy_line, = ax.plot([], [], label='Motion Energy')
+    threshold_line, = ax.plot([0, max_frames], [motion_energy_threshold, motion_energy_threshold], 'r--', label='Threshold')
+    motion_presence_line, = ax.plot([], [], label='Motion Presence')
+    ax.legend()
+    return fig, ax, motion_energy_line, threshold_line, motion_presence_line
+
+
+def update_plot(motion_energy_line, motion_presence_line, motion_data):
+    motion_energy_list = [data['motion_energy'] for data in motion_data]
+    motion_presence_wave = np.array([1 if data['motion_presence'] else 0 for data in motion_data])
+    motion_energy_line.set_xdata(np.arange(len(motion_energy_list)))
+    motion_energy_line.set_ydata(motion_energy_list)
+    motion_presence_line.set_xdata(np.arange(len(motion_presence_wave)))
+    motion_presence_line.set_ydata(motion_presence_wave ** 2)
+    plt.draw()
+    plt.pause(0.001)

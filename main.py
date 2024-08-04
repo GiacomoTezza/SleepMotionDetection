@@ -4,7 +4,7 @@ from annotator import VideoAnnotator
 INPUT_FOLDER = "./input/dataset1"
 OUTPUT_FOLDER = "./output/"
 OUTPUT_JSON = "output.json"
-HEADLESS = False
+HEADLESS = True
 
 LEARNING_RATE = -1      # alpha
 HISTORY = 200           # t
@@ -78,12 +78,12 @@ def annotateKnn(name, annotator, cap, learning_rate, dist2_threshold, detect_sha
 def main():
     banner()
     cap, filename = get_random_video(INPUT_FOLDER)
-    annotator = VideoAnnotator(filename)
+    annotator = VideoAnnotator(filename, OUTPUT_FOLDER)
     annotateMog1("param1", annotator, cap, LEARNING_RATE, HISTORY, N_MIXTURES, BACKGROUND_RATIO, NOISE_SIGMA, MOTION_ENERGY_THRESHOLD)
     annotateMog2("param1", annotator, cap, LEARNING_RATE, MOTION_ENERGY_THRESHOLD)
     annotateKnn("param1", annotator, cap, LEARNING_RATE, 400, False, MOTION_ENERGY_THRESHOLD)
     cap.release()
-    annotator.save_to_json(OUTPUT_FOLDER+OUTPUT_JSON)
+    annotator.save_to_json(OUTPUT_JSON)
 
 if __name__ == "__main__":
     main()
