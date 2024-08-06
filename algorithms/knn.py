@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 from .utils import calculate_window_positions, initialize_plot, update_plot
 from tqdm import trange
 
-def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_energy_threshold=0.01, headless=True):
+def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_energy_threshold=0.01, hysteresis=200, headless=True):
     fgbg = cv2.createBackgroundSubtractorKNN(dist2Threshold=dist2_threshold, detectShadows=detect_shadows)
     motion_data = []
     frames_tot = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-
+    hysteresis_counter = 0
 
     if not headless:
         window_positions_knn = calculate_window_positions(2)
@@ -32,7 +32,13 @@ def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_e
 
         # Calculate motion degree as the proportion of non-zero pixels in the foreground mask
         motion_energy = np.count_nonzero(fgmask) / fgmask.size
-        motion_presence = motion_energy > motion_energy_threshold
+        # Hysteresis
+        if motion_energy > motion_energy_threshold:
+            hysteresis_counter = hysteresis  # Reset counter when motion is detected
+        else:
+            hysteresis_counter -= 1
+
+        motion_presence = hysteresis_counter > 0
 
         motion_data.append({
             'frame': i,

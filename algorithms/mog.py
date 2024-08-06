@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 from .utils import calculate_window_positions, initialize_plot, update_plot
 from tqdm import trange
 
-def mog1(cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma, motion_energy_threshold=0.01, headless=True):
+def mog1(cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma, motion_energy_threshold=0.01, hysteresis=200, headless=True):
     fgbg = cv2.bgsegm.createBackgroundSubtractorMOG(history, n_mixtures, background_ratio, noise_sigma)
     motion_data = []
     frames_tot = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    hysteresis_counter = 0
 
     if not headless:
         window_positions_mog1 = calculate_window_positions(2)
@@ -31,7 +32,14 @@ def mog1(cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma,
 
         # Calculate motion degree as the proportion of non-zero pixels in the foreground mask
         motion_energy = np.count_nonzero(fgmask) / fgmask.size
-        motion_presence = motion_energy > motion_energy_threshold
+        # Hysteresis
+        # Hysteresis
+        if motion_energy > motion_energy_threshold:
+            hysteresis_counter = hysteresis  # Reset counter when motion is detected
+        else:
+            hysteresis_counter -= 1
+
+        motion_presence = hysteresis_counter > 0
 
         motion_data.append({
             'frame': i,
@@ -64,10 +72,11 @@ def mog1(cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma,
     
     return motion_data
 
-def mog2(cap, learning_rate, motion_energy_threshold=0.01, headless=True):
+def mog2(cap, learning_rate, motion_energy_threshold=0.01, hysteresis=200, headless=True):
     fgbg = cv2.createBackgroundSubtractorMOG2()
     motion_data = []
     frames_tot = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    hysteresis_counter = 0
 
     if not headless:
         window_positions_mog2 = calculate_window_positions(3)
@@ -91,7 +100,14 @@ def mog2(cap, learning_rate, motion_energy_threshold=0.01, headless=True):
 
         # Calculate motion degree as the proportion of non-zero pixels in the foreground mask
         motion_energy = np.count_nonzero(fgmask) / fgmask.size
-        motion_presence = motion_energy > motion_energy_threshold
+        # Hysteresis
+        # Hysteresis
+        if motion_energy > motion_energy_threshold:
+            hysteresis_counter = hysteresis  # Reset counter when motion is detected
+        else:
+            hysteresis_counter -= 1
+
+        motion_presence = hysteresis_counter > 0
 
         motion_data.append({
             'frame': i,
