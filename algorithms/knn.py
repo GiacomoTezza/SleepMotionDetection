@@ -1,11 +1,14 @@
 import cv2
 import numpy as np
-from .utils import calculate_window_positions
+import matplotlib.pyplot as plt
+from .utils import calculate_window_positions, initialize_plot, update_plot
 from tqdm import trange
 
 def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_energy_threshold=0.01, headless=True):
     fgbg = cv2.createBackgroundSubtractorKNN(dist2Threshold=dist2_threshold, detectShadows=detect_shadows)
     motion_data = []
+    frames_tot = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
 
     if not headless:
         window_positions_knn = calculate_window_positions(2)
@@ -13,8 +16,11 @@ def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_e
             cv2.namedWindow(window_name)
             cv2.resizeWindow(window_name, width, height)
             cv2.moveWindow(window_name, x, y)
+        
+        # Real-Time plot setup
+        fig, ax, motion_energy_line, threshold_line, motion_presence_line = initialize_plot(frames_tot, motion_energy_threshold)
 
-    for i in trange(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))):
+    for i in trange(frames_tot):
         # Capture frame-by-frame
         ret, frame = cap.read()
 
@@ -35,6 +41,9 @@ def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_e
         })
 
         if not headless:
+            # Real-Time plot
+            update_plot(motion_energy_line, motion_presence_line, motion_data)
+
             to_render = [fgmask, frame]
             for window_name, (x, y, w, h) in window_positions_knn.items():
                 cv2.imshow(window_name, to_render.pop())
@@ -51,5 +60,7 @@ def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_e
     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
     if not headless:
         cv2.destroyAllWindows()
+        plt.ioff()
+        plt.close()
     
     return motion_data

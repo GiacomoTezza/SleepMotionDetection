@@ -1,8 +1,6 @@
 import cv2
 import random
 import numpy as np
-# import matplotlib
-# matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from os import listdir, path
 from screeninfo import get_monitors
@@ -78,10 +76,10 @@ def initialize_plot(max_frames, motion_energy_threshold):
 
 def update_plot(motion_energy_line, motion_presence_line, motion_data):
     motion_energy_list = [data['motion_energy'] for data in motion_data]
-    motion_presence_wave = np.array([1 if data['motion_presence'] else 0 for data in motion_data])
+    motion_presence_wave = np.array([0.5 if data['motion_presence'] else 0 for data in motion_data])
     motion_energy_line.set_xdata(np.arange(len(motion_energy_list)))
     motion_energy_line.set_ydata(motion_energy_list)
     motion_presence_line.set_xdata(np.arange(len(motion_presence_wave)))
-    motion_presence_line.set_ydata(motion_presence_wave ** 2)
+    motion_presence_line.set_ydata(motion_presence_wave)
     plt.draw()
     plt.pause(0.001)

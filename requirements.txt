@@ -7,3 +7,4 @@ scikit-image
 ipykernel
 screeninfo
 tqdm
+PyQt6

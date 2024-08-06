@@ -4,7 +4,7 @@ from annotator import VideoAnnotator
 INPUT_FOLDER = "./input/dataset1"
 OUTPUT_FOLDER = "./output/"
 OUTPUT_JSON = "output.json"
-HEADLESS = True
+HEADLESS = False
 
 LEARNING_RATE = -1      # alpha
 HISTORY = 200           # t
