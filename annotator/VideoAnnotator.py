@@ -25,7 +25,7 @@ class VideoAnnotator:
         # Placeholder for actual encoding extraction method
         return "H264"
 
-    def add_motion_data(self, algorithm_name, parameters, motion_data):
+    def add_motion_data(self, algorithm_name, parameters, motion_data, notes=None):
         algorithm_id = len(self.algorithms)
         # Store algorithm details
         algorithm_info = {
@@ -33,6 +33,9 @@ class VideoAnnotator:
             "name": algorithm_name,
             "parameters": parameters
         }
+        if (notes != None):
+            algorithm_info['notes'] = notes
+        
         self.algorithms.append(algorithm_info)
 
         motion_energy_list = []

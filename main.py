@@ -1,10 +1,11 @@
-from algorithms import get_random_video, mog1, mog2, knn
-from annotator import VideoAnnotator
+from algorithms import *
+from annotator import *
 
 INPUT_FOLDER = "./input/dataset2"
+INPUT_VIDEO = "./input/dataset2/3.mp4"
 OUTPUT_FOLDER = "./output/"
 OUTPUT_JSON = "output.json"
-HEADLESS = False
+HEADLESS = True
 
 LEARNING_RATE = -1      # alpha
 HISTORY = 200           # t
@@ -12,7 +13,7 @@ N_MIXTURES = 5          # K (number of gaussians)
 BACKGROUND_RATIO = 0.1  # Gaussian threshold
 NOISE_SIGMA = 1
 MOTION_ENERGY_THRESHOLD = 0.01
-HYSTERESIS = 50
+HYSTERESIS = 25
 
 def banner():
     print("""
@@ -28,64 +29,21 @@ Github:  https://github.com/GiacomoTezza
 
 """)
 
-def annotateMog1(name, annotator, cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma, motion_energy_threshold, hysteresis):
-    print(f"[MOG1][{name}] Running...")
-    mog1_data = mog1(cap, learning_rate, history, n_mixtures, background_ratio, noise_sigma, motion_energy_threshold, hysteresis, headless=HEADLESS)
-    annotator.add_motion_data(
-        algorithm_name=f"MOG1-{name}",
-        parameters={
-            "LearningRate": learning_rate,
-            "History": history,
-            "NumberMixtures": n_mixtures,
-            "BackgroundRatio": background_ratio,
-            "NoiseSigma": noise_sigma,
-            "MotionEnergyThreshold": motion_energy_threshold,
-            "Hysteresis": hysteresis
-        },
-        motion_data=mog1_data
-    )
-    print(f"[MOG1][{name}] Completed!\n")
-
-
-def annotateMog2(name, annotator, cap, learning_rate, motion_energy_threshold, hysteresis):
-    print(f"[MOG2][{name}] Running...")
-    mog2_data = mog2(cap, learning_rate, motion_energy_threshold, hysteresis, headless=HEADLESS)
-    annotator.add_motion_data(
-        algorithm_name=f"MOG2-{name}",
-        parameters={
-            "LearningRate": learning_rate,
-            "MotionEnergyThreshold": motion_energy_threshold,
-            "Hysteresis": hysteresis
-        },
-        motion_data=mog2_data
-    )
-    print(f"[MOG2][{name}] Completed!\n")
-
-
-def annotateKnn(name, annotator, cap, learning_rate, dist2_threshold, detect_shadows, motion_energy_threshold, hysteresis):
-    print(f"[KNN][{name}] Running...")
-    knn_data = knn(cap, learning_rate, dist2_threshold, detect_shadows, motion_energy_threshold, hysteresis, headless=HEADLESS)
-    annotator.add_motion_data(
-        algorithm_name=f"KNN-{name}",
-        parameters={
-            "LearningRate": learning_rate,
-            "DistanceToThreshold": dist2_threshold,
-            "DetectShadows": detect_shadows,
-            "MotionEnergyThreshold": motion_energy_threshold,
-            "Hysteresis": hysteresis
-        },
-        motion_data=knn_data
-    )
-    print(f"[KNN][{name}] Completed!\n")
-
-
 def main():
     banner()
-    cap, filename = get_random_video(INPUT_FOLDER)
+    # cap, filename = get_random_video(INPUT_FOLDER)
+    cap, filename = get_video(INPUT_VIDEO)
     annotator = VideoAnnotator(filename, OUTPUT_FOLDER)
-    annotateMog1("param1", annotator, cap, LEARNING_RATE, HISTORY, N_MIXTURES, BACKGROUND_RATIO, NOISE_SIGMA, MOTION_ENERGY_THRESHOLD, HYSTERESIS)
-    annotateMog2("param1", annotator, cap, LEARNING_RATE, MOTION_ENERGY_THRESHOLD, HYSTERESIS)
-    annotateKnn("param1", annotator, cap, LEARNING_RATE, 400, False, MOTION_ENERGY_THRESHOLD, HYSTERESIS)
+    # annotateMog1("param1", annotator, cap, 0.75, HISTORY, N_MIXTURES, BACKGROUND_RATIO, NOISE_SIGMA, MOTION_ENERGY_THRESHOLD, HYSTERESIS, HEADLESS)
+    # annotateMog1("param2", annotator, cap, 0.9, HISTORY, N_MIXTURES, BACKGROUND_RATIO, NOISE_SIGMA, MOTION_ENERGY_THRESHOLD, HYSTERESIS, HEADLESS)
+    # annotateMog1("param3", annotator, cap, 1, HISTORY, N_MIXTURES, BACKGROUND_RATIO, NOISE_SIGMA, MOTION_ENERGY_THRESHOLD, HYSTERESIS, HEADLESS)
+
+    # annotateMog2("param1", annotator, cap, LEARNING_RATE, MOTION_ENERGY_THRESHOLD, HYSTERESIS, HEADLESS)
+    # annotateKnn("param1", annotator, cap, LEARNING_RATE, 400, False, MOTION_ENERGY_THRESHOLD, HYSTERESIS, HEADLESS)
+
+    grid_search_knn(annotator, filename)
+    grid_search_mog2(annotator, filename)
+    grid_search_mog1(annotator, filename)
     cap.release()
     annotator.save_to_json(OUTPUT_JSON)
 

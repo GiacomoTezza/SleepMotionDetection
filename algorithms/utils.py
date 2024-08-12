@@ -23,6 +23,10 @@ def get_random_video(directory):
     cap = cv2.VideoCapture(filename)
     return (cap, filename)
 
+def get_video(filename):
+    cap = cv2.VideoCapture(filename)
+    return (cap, filename)
+
 def calculate_window_positions(num_windows):
     # Get screen dimensions
     screen_width, screen_height = get_screen_resolution()
