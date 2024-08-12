@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from .utils import calculate_window_positions, initialize_plot, update_plot
 from tqdm import trange
 
-def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_energy_threshold=0.01, hysteresis=200, headless=True):
+def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_energy_threshold=0.01, hysteresis=200, headless=True, show_progress=True):
     fgbg = cv2.createBackgroundSubtractorKNN(dist2Threshold=dist2_threshold, detectShadows=detect_shadows)
     motion_data = []
     frames_tot = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -20,7 +20,12 @@ def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_e
         # Real-Time plot setup
         fig, ax, motion_energy_line, threshold_line, motion_presence_line = initialize_plot(frames_tot, motion_energy_threshold)
 
-    for i in trange(frames_tot):
+    if show_progress:
+        frame_iter = trange(frames_tot, desc="Processing Frames")
+    else:
+        frame_iter = range(frames_tot)
+    
+    for i in frame_iter:
         # Capture frame-by-frame
         ret, frame = cap.read()
 
@@ -29,6 +34,13 @@ def knn(cap, learning_rate, dist2_threshold=400.0, detect_shadows=True, motion_e
             break
 
         fgmask = fgbg.apply(frame, learning_rate)
+
+        # Apply Morphological Opening to reduce noise and improve contour detection
+        kernel = np.ones((3, 3), np.uint8)
+        fgmask = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel)
+
+        # Median blur
+        fgmask = cv2.medianBlur(fgmask, 5)
 
         # Calculate motion degree as the proportion of non-zero pixels in the foreground mask
         motion_energy = np.count_nonzero(fgmask) / fgmask.size
