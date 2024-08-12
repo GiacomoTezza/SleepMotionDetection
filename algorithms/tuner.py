@@ -37,13 +37,13 @@ def calculate_noise_level(motion_data):
 
 
 def run_mog1(params):
-    lr, h, nm, br, ns, met, hys, video_path, headless = params
+    lr, h, nm, br, ns, met, hys, video_path = params
     cap = cv2.VideoCapture(video_path)
-    mog1_data = mog1(cap, lr, h, nm, br, ns, met, hys, headless=headless, show_progress=False)
+    mog1_data = mog1(cap, lr, h, nm, br, ns, met, hys, headless=True, show_progress=False)
     consistency_score = calculate_consistency(mog1_data)
     variance, mean_motion_energy = calculate_motion_energy_distribution(mog1_data)
     noise_score = calculate_noise_level(mog1_data)
-    total_score = (consistency_score * 0.4) + (1 / (variance + 1) * 0.3) - (noise_score * 0.3)
+    total_score = (consistency_score * 0.2) + (1 / (variance + 1) * 0.5) - (noise_score * 0.2)
 
     return {
         "parameters": {
@@ -67,13 +67,13 @@ def run_mog1(params):
 
 
 def run_mog2(params):
-    lr, met, hys, video_path, headless = params
+    lr, met, hys, video_path = params
     cap = cv2.VideoCapture(video_path)
-    mog2_data = mog2(cap, lr, met, hys, headless=headless, show_progress=False)
+    mog2_data = mog2(cap, lr, met, hys, headless=True, show_progress=False)
     consistency_score = calculate_consistency(mog2_data)
     variance, mean_motion_energy = calculate_motion_energy_distribution(mog2_data)
     noise_score = calculate_noise_level(mog2_data)
-    total_score = (consistency_score * 0.4) + (1 / (variance + 1) * 0.3) - (noise_score * 0.3)
+    total_score = (consistency_score * 0.2) + (1 / (variance + 1) * 0.5) - (noise_score * 0.2)
 
     return {
         "parameters": {
@@ -93,13 +93,13 @@ def run_mog2(params):
 
 
 def run_knn(params):
-    lr, d2t, ds, met, hys, video_path, headless = params
+    lr, d2t, ds, met, hys, video_path = params
     cap = cv2.VideoCapture(video_path)
-    knn_data = knn(cap, lr, d2t, ds, met, hys, headless=headless, show_progress=False)
+    knn_data = knn(cap, lr, d2t, ds, met, hys, headless=True, show_progress=False)
     consistency_score = calculate_consistency(knn_data)
     variance, mean_motion_energy = calculate_motion_energy_distribution(knn_data)
     noise_score = calculate_noise_level(knn_data)
-    total_score = (consistency_score * 0.4) + (1 / (variance + 1) * 0.3) - (noise_score * 0.3)
+    total_score = (consistency_score * 0.2) + (1 / (variance + 1) * 0.5) - (noise_score * 0.2)
 
     return {
         "parameters": {
@@ -123,15 +123,16 @@ def grid_search_mog1(annotator, video_path):
     learning_rates = [-1]
     histories = [100, 200, 300]
     n_mixtures = [3, 5, 7]
-    background_ratios = [0.05, 0.1, 0.2]
-    noise_sigmas = [0.5, 1, 1.5]
-    motion_energy_thresholds = [0.01, 0.015, 0.002]
-    hysteresis_values = [10, 25, 50]
+    background_ratios = [0.6, 0.7, 0.8]
+    noise_sigmas = [0]
+    motion_energy_thresholds = [0.01, 0.005, 0.002]
+    hysteresis_values = [25]
     total_combinations = len(learning_rates) * len(histories) * len(n_mixtures) * len(background_ratios) * len(noise_sigmas) * len(motion_energy_thresholds) * len(hysteresis_values)
 
     params = list(itertools.product(
-        learning_rates, histories, n_mixtures, background_ratios, noise_sigmas, motion_energy_thresholds, hysteresis_values, [video_path], [True]))
+        learning_rates, histories, n_mixtures, background_ratios, noise_sigmas, motion_energy_thresholds, hysteresis_values, [video_path]))
 
+    print(f"[MOG1] Searching parameters...")
     with Pool(processes=4) as pool:  # Use multiprocessing to speed up the computation
         results = list(tqdm(pool.imap(run_mog1, params), total=total_combinations))
 
@@ -148,17 +149,19 @@ def grid_search_mog1(annotator, video_path):
             motion_data=result['motion_data'],
             notes=result['scores']
         )
+    print(f"[MOG1] Completed!\n")
 
 
 def grid_search_mog2(annotator, video_path):
     learning_rates = [-1]
     motion_energy_thresholds = [0.01, 0.015, 0.002]
-    hysteresis_values = [10, 25, 50]
+    hysteresis_values = [25]
     total_combinations = len(learning_rates) * len(motion_energy_thresholds) * len(hysteresis_values)
 
     params = list(itertools.product(
-        learning_rates, motion_energy_thresholds, hysteresis_values, [video_path], [True]))
+        learning_rates, motion_energy_thresholds, hysteresis_values, [video_path]))
 
+    print(f"[MOG2] Searching parameters...")
     with Pool(processes=4) as pool:  # Use multiprocessing to speed up the computation
         results = list(tqdm(pool.imap(run_mog2, params), total=total_combinations))
 
@@ -175,19 +178,21 @@ def grid_search_mog2(annotator, video_path):
             motion_data=result['motion_data'],
             notes=result['scores']
         )
+    print(f"[MOG2] Completed!\n")
 
 
 def grid_search_knn(annotator, video_path):
     learning_rates = [-1]
     distance_to_threshold = [200, 400, 600]
-    detect_shadows = [True, False]
-    motion_energy_thresholds = [0.01, 0.015, 0.002]
-    hysteresis_values = [10, 25, 50]
+    detect_shadows = [True]
+    motion_energy_thresholds = [0.0175, 0.015, 0.02]
+    hysteresis_values = [25]
     total_combinations = len(learning_rates) * len(distance_to_threshold) * len(detect_shadows) * len(motion_energy_thresholds) * len(hysteresis_values)
 
     params = list(itertools.product(
-        learning_rates, distance_to_threshold, detect_shadows, motion_energy_thresholds, hysteresis_values, [video_path], [True]))
+        learning_rates, distance_to_threshold, detect_shadows, motion_energy_thresholds, hysteresis_values, [video_path]))
 
+    print(f"[KNN] Searching parameters...")
     with Pool(processes=4) as pool:  # Use multiprocessing to speed up the computation
         results = list(tqdm(pool.imap(run_knn, params), total=total_combinations))
 
@@ -204,3 +209,4 @@ def grid_search_knn(annotator, video_path):
             motion_data=result['motion_data'],
             notes=result['scores']
         )
+    print(f"[KNN] Completed!\n")
